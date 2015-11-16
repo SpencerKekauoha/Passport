@@ -42,7 +42,7 @@ app.post('/login', passport.authenticate('local', {
 }));
 app.get('/logout', function(req, res, next) {
   req.logout();
-  return res.send('logged out');
+  return res.status(200).send('logged out');
 });
 
 
