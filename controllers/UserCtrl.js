@@ -2,25 +2,25 @@ var User = require('../models/UserModel');
 
 module.exports = {
 
-  register: function(req, res) {
-    var newUser = new User(req.body);
-    newUser.save(function(err, user) {
+  register: function(req, res, next) {
+    User.create(req.body, function(err, result) {
       if(err) return res.send(err);
-      user.password = null;
-      return res.send(user);
+      newUser = result.toObject();
+      newUser.password = null;
+      res.status(200).json(newUser);
     });
   },
 
-  me: function(req, res) {
-    if (!req.user) return res.send("current user not defined");
+  me: function(req, res, next) {
+    if (!req.user) return res.status(401).send('current user not defined');
     req.user.password = null;
-    return res.json(req.user);
+    return res.status(200).json(req.user);
   },
 
-  update: function(req, res, done) {
-    User.findByIdAndUpdate(req.user._id, req.body, function(err, result) {
-      if (err) done(err);
-      res.sendStatus(200);
+  update: function(req, res, next) {
+    User.findByIdAndUpdate(req.params._id, req.body, function(err, result) {
+      if (err) next(err);
+      res.status(200).send('user updated');
     });
   }
 };

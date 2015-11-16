@@ -16,7 +16,7 @@ var passport = require('./services/passport');
 
 // POLICIES //
 var isAuthed = function(req, res, next) {
-  if (!req.isAuthenticated()) return res.sendStatus(401);
+  if (!req.isAuthenticated()) return res.status(401).send();
   return next();
 };
 
@@ -26,21 +26,21 @@ var app = express();
 
 app.use(bodyParser.json());
 app.use(session({
-  secret: 'gweriwrb-erfawrg45-oasWsd',
-  saveUninitialized: true,
-  resave: true
+  secret: config.SESSION_SECRET,
+  saveUninitialized: false,
+  resave: false
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.post('/user', UserCtrl.register);
-app.get('/user', isAuthed, UserCtrl.me);
-app.put('/user', isAuthed, UserCtrl.update);
+app.post('/users', UserCtrl.register);
+app.get('/me', isAuthed, UserCtrl.me);
+app.put('/users/:_id', isAuthed, UserCtrl.update);
 
 app.post('/login', passport.authenticate('local', {
-  successRedirect: '/user'
+  successRedirect: '/me'
 }));
-app.get('/logout', function(req, res) {
+app.get('/logout', function(req, res, next) {
   req.logout();
   return res.send('logged out');
 });
